@@ -1,0 +1,16 @@
+{
+	"language": "Language",
+    "login": {
+        "login": "Login",
+        "email": "Email",
+        "password": "Password",
+        "createAccount": "Create a new Account"
+    },
+    "signin": {
+        "signin": "Signin",
+        "name": "Name",
+        "email": "Email",
+        "password": "Password",
+        "alreadyHaveAccount": "Already have an Account"
+    }
+}

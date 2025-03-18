@@ -1,0 +1,16 @@
+{
+	"language": "שפּראַך",
+    "login": {
+        "login": "לאָגין",
+        "email": "בליצפּאָסט",
+        "password": "שפּריכוואָרט",
+        "createAccount": "שאַפֿן אַ נייַע חשבון"
+    },
+    "signin": {
+        "signin": "צייכן אין",
+        "name": "נאָמען",
+        "email": "בליצפּאָסט",
+        "password": "שפּריכוואָרט",
+        "alreadyHaveAccount": "שוין האָבן אַ חשבון"
+    }
+}
