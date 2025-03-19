@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Login from './Login';
 import Signin from './Signin';
+import Chat from './Chat';
 
 export default function Index() {
     const [email, setEmail] = useState("")
@@ -13,6 +14,7 @@ export default function Index() {
         <SafeAreaView style={styles.container}>
             <Login />
             {/* <Signin /> */}
+            {/* <Chat /> */}
         </SafeAreaView>
     );
 }

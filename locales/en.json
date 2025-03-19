@@ -4,13 +4,21 @@
         "login": "Login",
         "email": "Email",
         "password": "Password",
-        "createAccount": "Create a new Account"
+        "createAccount": "Create a new Account",
+        "emailRequired": "Please enter your email",
+        "emailInvalid": "Please enter valid email",
+        "passwordRequired": "Please enter your password"
     },
     "signin": {
         "signin": "Signin",
         "name": "Name",
         "email": "Email",
         "password": "Password",
-        "alreadyHaveAccount": "Already have an Account"
+        "alreadyHaveAccount": "Already have an Account",
+        "nameRequired": "Please enter your name",
+        "emailRequired": "Please enter your email",
+        "emailInvalid": "Please enter valid email",
+        "passwordRequired": "Please enter your password",
+        "passwordMinlength": "Password length must be greater then or equal to 6"
     }
 }
