@@ -1,20 +1,33 @@
 import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import Login from './Login';
 import Signin from './Signin';
-import Chat from './Chat';
+import ChatList from './ChatList';
+import ChatRoom from './ChatRoom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase';
+
 
 export default function Index() {
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+    const [user, setUser] = useState(null);
+
+    // useEffect(() => {
+    //     onAuthStateChanged(auth, (user) => {
+    //         console.log("user det...", user)
+    //         // if (user) {
+    //         //     setUser(user)
+    //         // }
+    //     })
+    // }, [])   
 
     return (
         <SafeAreaView style={styles.container}>
-            <Login />
+            {/* <Login /> */}
             {/* <Signin /> */}
-            {/* <Chat /> */}
+            {/* <ChatList /> */}
+            <ChatRoom />
         </SafeAreaView>
     );
 }

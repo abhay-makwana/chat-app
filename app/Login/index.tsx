@@ -42,11 +42,13 @@ export default function Login() {
                 const user = userRes.user;
                 console.log("FBase res:- ", userRes);
                 await SecureStore.setItemAsync('user', JSON.stringify(user));
-                router.replace('/Chat');
+                router.replace('/ChatList');
             })
             .catch((err) => {
+                let msg = err.message
                 console.log("FBase err:- ", err);
-                alert(err.message)
+                msg = msg.includes("auth/invalid-email") || msg.includes("auth/invalid-credential") ? t('login.invalidEmailOrPassword') : msg
+                alert(msg)
             })
     }
 

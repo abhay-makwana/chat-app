@@ -35,6 +35,8 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="signin" options={{ headerShown: false }} />
+        <Stack.Screen name="chatlist" options={{ headerShown: false }} />
+        <Stack.Screen name="ChatRoom" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -7,7 +7,8 @@
         "createAccount": "Create a new Account",
         "emailRequired": "Please enter your email",
         "emailInvalid": "Please enter valid email",
-        "passwordRequired": "Please enter your password"
+        "passwordRequired": "Please enter your password",
+        "invalidEmailOrPassword": "Invalid Email/Password"
     },
     "signin": {
         "signin": "Signin",
@@ -20,5 +21,8 @@
         "emailInvalid": "Please enter valid email",
         "passwordRequired": "Please enter your password",
         "passwordMinlength": "Password length must be greater then or equal to 6"
+    },
+    "chatroom": {
+        "yourMessage": "Type your message here"
     }
 }

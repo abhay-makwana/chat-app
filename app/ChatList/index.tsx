@@ -1,13 +1,17 @@
 import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList } from 'react-native';
 import { Link } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
+import { doc, getDoc, getDocs, onSnapshot, query } from 'firebase/firestore';
+import { db } from '../../firebase';
+
 
 const isRtl = I18nManager.isRTL;
 
-export default function Chat() {
+export default function ChatList(navigation: any, router: any) {
     const { i18n, t } = useTranslation();
 
     const [chatList, setChatList] = useState([
@@ -47,6 +51,37 @@ export default function Chat() {
             email: 'jagat@yopmail.com',
         },
     ]);
+
+    const getChatUsers = async () => {
+        const usrData = await SecureStore.getItemAsync('user');
+        const formattedUsrData = JSON.parse(usrData);
+
+        const qry = query(doc(db, "users", formattedUsrData.uid));
+        const unsubscribe = onSnapshot(qry, async (snapshot) => {
+            const contactsObject = snapshot.data()
+            console.log("contactsObject:--", contactsObject)
+            const contactsSnap = await contactsObject.map((cntct) => getDoc(doc(db, "users", cntct)))
+            console.log("contactsSnap:--", contactsSnap)
+            const contactDetails = contactsSnap.map((dtls) => ({
+                id: dtls.uid,
+                ...dtls.data()
+            }))
+            console.log("contactDetails:--", contactDetails)
+        })
+        console.log("got data:--", qry)
+
+        // const qrySnapshot = await getDocs(qry);
+        // console.log("got users1: ", qrySnapshot)
+        // let data = [];
+        // qrySnapshot.forEach(doc => {
+        //     data.push({...doc.data()})
+        // });
+        // console.log("got users: ", data)
+    }
+
+    useEffect(() => {
+        getChatUsers()
+    }, [navigation]);
 
     const renderChatListItem = (index: number, item: object) => {
         return (
