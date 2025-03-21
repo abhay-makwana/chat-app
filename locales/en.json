@@ -23,6 +23,7 @@
         "passwordMinlength": "Password length must be greater then or equal to 6"
     },
     "chatroom": {
-        "yourMessage": "Type your message here"
+        "yourMessage": "Type your message here",
+        "message": "Message"
     }
 }

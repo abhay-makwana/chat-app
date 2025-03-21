@@ -24,10 +24,10 @@ export default function Index() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* <Login /> */}
+            <Login />
             {/* <Signin /> */}
             {/* <ChatList /> */}
-            <ChatRoom />
+            {/* <ChatRoom /> */}
         </SafeAreaView>
     );
 }
