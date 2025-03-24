@@ -1,5 +1,8 @@
 {
 	"language": "Language",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel": "Cancel",
     "login": {
         "login": "Login",
         "email": "Email",
@@ -24,6 +27,8 @@
     },
     "chatroom": {
         "yourMessage": "Type your message here",
-        "message": "Message"
+        "message": "Message",
+        "deletedMessage": "This message is deleted",
+        "messageOptions": "Message Options"
     }
 }

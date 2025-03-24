@@ -5,9 +5,9 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
-import { doc, getDoc, getDocs, onSnapshot, query, collection, where } from 'firebase/firestore';
+import { doc, getDoc, getDocs, onSnapshot, query, collection, where, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-
+import * as Notifications from "expo-notifications";
 
 const isRtl = I18nManager.isRTL;
 
@@ -50,8 +50,29 @@ export default function ChatList(navigation: any) {
 
     }
 
+    const registerForPushNotifications = async () => {
+        const usrData = await SecureStore.getItemAsync('user');
+        const formattedUsrData = JSON.parse(usrData);
+        
+        const { status } = await Notifications.getPermissionsAsync();
+        if (status !== "granted") {
+          const { status: newStatus } = await Notifications.requestPermissionsAsync();
+          if (newStatus !== "granted") {
+            alert("Permission not granted for push notifications!");
+            return;
+          }
+        }
+      
+        const token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log("FCM Token:", token);
+      
+        // Save the token to Firestore under the user's profile
+        await setDoc(doc(db, "users", formattedUsrData.uid), { pushToken: token }, { merge: true });
+    };
+
     useEffect(() => {
         getChatUsers()
+        // registerForPushNotifications()
     }, [navigation]);
 
     const renderChatListItem = (index: number, item: object) => {

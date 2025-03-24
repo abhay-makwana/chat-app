@@ -1,5 +1,8 @@
 {
 	"language": "שפּראַך",
+    "edit": "רעדאַגירן",
+    "delete": "ויסמעקן",
+    "cancel": "באָטל מאַכן",
     "login": {
         "login": "לאָגין",
         "email": "בליצפּאָסט",
@@ -23,6 +26,8 @@
     },
     "chatroom": {
         "yourMessage": "טיפּ דיין אָנזאָג דאָ",
-        "message": "אָנזאָג"
+        "message": "אָנזאָג",
+        "deletedMessage": "דער אָנזאָג איז אויסגעמעקט",
+        "messageOptions": "אָנזאָג אָפּציעס"
     }
 }

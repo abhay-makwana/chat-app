@@ -1,13 +1,13 @@
-import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, Alert } from 'react-native';
+import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, Alert, Pressable } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
-import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { Entypo, FontAwesome } from '@expo/vector-icons';
+import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
 
 const isRtl = I18nManager.isRTL;
@@ -19,6 +19,9 @@ export default function ChatRoom(navigation: any) {
 
     const [messageList, setMessageList] = useState([]);
     const [message, setMessage] = useState("");
+    const [isEditMsg, setIsEditMsg] = useState(false);
+    const [selectedMsg, setSelectedMsg] = useState({});
+
     const textRef = useRef("");
     const inputRef = useRef(null);
 
@@ -31,15 +34,61 @@ export default function ChatRoom(navigation: any) {
         return roomId;
     }
 
+    const handleLongPress = async (message: object) => {
+    const roomId = await getRoomId();
+    const msgRef = doc(db, "rooms", roomId, "messages", message.msgId);
+    let sendMessage = textRef.current.trim();
+
+    // // await updateDoc(msgRef, { text: sendMessage, editedAt: Timestamp.fromDate(new Date()) })
+
+        Alert.alert(
+            t("chatroom.messageOptions"),
+            message.text,
+            [
+                { text: t("cancel"), style: "cancel" },
+                { text: t("edit"), onPress: () => {
+                        setIsEditMsg(true);
+                        setSelectedMsg(message);
+                        textRef.current = message.text;
+                        inputRef.current?.setNativeProps({ text: message.text }); // Set text into the input
+                        inputRef.current?.focus(); // Focus on the input                        
+                    }
+                },
+                { text: t("delete"), onPress: async () => {
+                    Alert.alert(
+                        "Are you sure you want to delete this message?",
+                        message.text,
+                        [
+                            { text: t("cancel"), style: "cancel" },
+                            { text: t("delete"), onPress: async () => {
+                                    await updateDoc(msgRef, { deleted: true, deletedAt: Timestamp.fromDate(new Date()) })
+                                }
+                            }
+                        ])
+                        // await updateDoc(msgRef, { deleted: true, deletedAt: Timestamp.fromDate(new Date()) })
+                    }
+                },
+            ]
+        );
+    };
+
     const renderMessageListItem = async (index: number, item: object) => {
         const usrData = await SecureStore.getItemAsync('user');
         const formattedUsrData = JSON.parse(usrData);
         ;
         return (
             <View style={item.uid == formattedUsrData.uid ? styles.rightAlignContainer : styles.leftAlignContainer}>
-                <TouchableOpacity style={[styles.itemContainer, item.uid == formattedUsrData.uid ? styles.itemContainerSender : styles.itemContainerReceiver]}>
-                    <Text style={styles.listItemText}>{item.text}</Text>
-                </TouchableOpacity>
+                <Pressable
+                    style={[styles.itemContainer, item.uid == formattedUsrData.uid ? styles.itemContainerSender : styles.itemContainerReceiver]}
+                    onLongPress={() => {
+                        item.uid == formattedUsrData.uid && !item.deleted && handleLongPress(item)
+                    }}>
+                        <View style={styles.listItemTextContainer}>
+                            {item.deleted &&
+                                <MaterialIcons name='do-not-disturb' size={hp(2.5)} color='grey' style={styles.delIcon} />}
+                            <Text style={styles.listItemText}>{item.deleted ? t('chatroom.deletedMessage') : item.text}</Text>
+                        </View>
+                </Pressable>
             </View>
         )
     }
@@ -47,7 +96,7 @@ export default function ChatRoom(navigation: any) {
     const createRoomIfNotExists = async () => {
         const roomId = await getRoomId();
 
-        console.log("Formatted room id:-", roomId)
+        // console.log("Formatted room id:-", roomId)
         
         await setDoc(doc(db, "rooms", roomId), {
             roomId,
@@ -61,11 +110,15 @@ export default function ChatRoom(navigation: any) {
         const docRef = doc(db, "rooms", roomId);
         const messageRef = collection(docRef, "messages");
         const qry = query(messageRef, orderBy('createdAt', 'asc'));
-
+        // console.log("getMessages qry.:--", messageRef, JSON.stringify(qry))
         let unsub = onSnapshot(qry, (snapshot) => {
-            let allMessages = snapshot.docs.map(doc => {
-                return doc.data();
-            });
+            // console.log("snapshot.:-", snapshot)
+            let allMessages = snapshot.docs.map(doc => ({
+                // console.log("snapshot map:-", doc.data(), doc.id);
+                msgId: doc.id,
+                ...doc.data()
+            }));
+            // return allMessages
             setMessageList([...allMessages])
         })
 
@@ -76,29 +129,46 @@ export default function ChatRoom(navigation: any) {
         let sendMessage = textRef.current.trim();
         if (!sendMessage) return;
 
-        try {
-            const usrData = await SecureStore.getItemAsync('user');
-            const formattedUsrData = JSON.parse(usrData);
-            const roomId = await getRoomId();
+        if (isEditMsg) {
+            try {
+                const roomId = await getRoomId();
+                const msgRef = doc(db, "rooms", roomId, "messages", selectedMsg.msgId);
+                let sendMessage = textRef.current.trim();
 
-            const docRef = doc(db, 'rooms', roomId);
-            const messageRef = collection(docRef, "messages");
+                textRef.current = "";
+                if (inputRef) inputRef?.current?.clear();
+                setIsEditMsg(false);
 
-            // clear textInput on send button
-            textRef.current = "";
-            if (inputRef) inputRef?.current?.clear();
+                await updateDoc(msgRef, { text: sendMessage, editedAt: Timestamp.fromDate(new Date()) })
 
-            const newDoc = await addDoc(messageRef, {
-                uid: formattedUsrData.uid,
-                text: sendMessage,
-                avatar: "",
-                createdAt: Timestamp.fromDate(new Date())
-            })
-            setMessage("");
-            // console.log("new message info.:-", newDoc);
+            } catch (err) {
+                Alert.alert(t('chatroom.message'), err.message)
+            } 
+        } else {
+            try {
+                const usrData = await SecureStore.getItemAsync('user');
+                const formattedUsrData = JSON.parse(usrData);
+                const roomId = await getRoomId();
 
-        } catch(err) {
-            Alert.alert(t('chatroom.message'), err.message)
+                const docRef = doc(db, 'rooms', roomId);
+                const messageRef = collection(docRef, "messages");
+
+                // clear textInput on send button
+                textRef.current = "";
+                if (inputRef) inputRef?.current?.clear();
+
+                const newDoc = await addDoc(messageRef, {
+                    uid: formattedUsrData.uid,
+                    text: sendMessage,
+                    avatar: "",
+                    createdAt: Timestamp.fromDate(new Date())
+                })
+                setMessage("");
+                // console.log("new message info.:-", newDoc);
+
+            } catch(err) {
+                Alert.alert(t('chatroom.message'), err.message)
+            }
         }
     }
 
@@ -108,7 +178,7 @@ export default function ChatRoom(navigation: any) {
         getMessages()
     }, [])
 
-    console.log("Message list:-", messageList)
+    // console.log("Message list:-", messageList)
     
     return (
         <SafeAreaView style={styles.container}>
@@ -129,7 +199,7 @@ export default function ChatRoom(navigation: any) {
                 <FlatList
                     data={messageList}
                     renderItem={({index, item}) => renderMessageListItem(index, item)}
-                    keyExtractor={item => item.id}
+                    keyExtractor={item => Math.random()}
                     style={styles.flatlistSty}
                 />   
             </View>
@@ -139,7 +209,10 @@ export default function ChatRoom(navigation: any) {
                 <TextInput
                     ref={inputRef}
                     style={styles.input}
-                    onChangeText={(text) => textRef.current = text }
+                    onChangeText={(text) => {
+                        textRef.current = text
+                        !text.length && setIsEditMsg(false)
+                    }}
                     // value={message}
                     placeholder={t('chatroom.yourMessage')}
                     multiline
@@ -216,6 +289,13 @@ const styles = StyleSheet.create({
     },
     rightAlignContainer: {
         alignItems: "flex-end"
+    },
+    listItemTextContainer: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    delIcon: {
+        marginRight: wp(1),
     },
     listItemText: {
         fontSize: hp(2),
