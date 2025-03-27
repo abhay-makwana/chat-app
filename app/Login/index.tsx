@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager } from 'react-native';
+import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, Image } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -60,6 +60,11 @@ export default function Login() {
 
     return (
         <SafeAreaView style={styles.container}>
+                <Image
+                    source={require('../../assets/images/auth/login.jpg')}
+                    style={styles.loginImg}
+                />
+                
                 <Text style={styles.titleText}>{t('login.login')}</Text>
 
                 <TextInput
@@ -92,7 +97,7 @@ export default function Login() {
                     <Text style={styles.buttonText}>{t('login.login')}</Text>
                 </TouchableOpacity>
 
-                <Link href="/Signin" style={styles.registerButton}>
+                <Link href="/Signup" style={styles.registerButton}>
                     {t('login.createAccount')}
                 </Link>
         </SafeAreaView>
@@ -101,22 +106,29 @@ export default function Login() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        width: '100%',
+        height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#ffffff'
+    },
+    loginImg: {
+        width: wp(60),
+        height: hp(30),
+        resizeMode: 'contain',
     },
     titleText: {
         fontSize: hp(4),
         fontWeight: 'bold',
         color: 'grey',
-        marginBottom: hp(4)
+        marginBottom: hp(3)
     },
     input: {
         width: wp(80),
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#f5f5f5',
         marginVertical: hp(1),
-        borderRadius: hp(0.5),
-        padding: hp(1.5)
+        borderRadius: hp(5),
+        padding: hp(1.7),
     },
     errorText: {
         width: wp(80),
@@ -127,7 +139,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'powderblue',
         alignItems: 'center',
         paddingVertical: hp(1),
-        borderRadius: hp(0.5),
+        borderRadius: hp(5),
         marginTop: hp(2)
     },
     buttonText: {

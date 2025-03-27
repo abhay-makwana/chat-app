@@ -13,8 +13,8 @@
         "passwordRequired": "Please enter your password",
         "invalidEmailOrPassword": "Invalid Email/Password"
     },
-    "signin": {
-        "signin": "Signin",
+    "signup": {
+        "signup": "Signup",
         "name": "Name",
         "email": "Email",
         "password": "Password",

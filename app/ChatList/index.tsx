@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList } from 'react-native';
+import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, ActivityIndicator } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -8,6 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { doc, getDoc, getDocs, onSnapshot, query, collection, where, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import * as Notifications from "expo-notifications";
+import { Entypo, FontAwesome6 } from '@expo/vector-icons';
 
 const isRtl = I18nManager.isRTL;
 
@@ -78,8 +79,14 @@ export default function ChatList(navigation: any) {
     const renderChatListItem = (index: number, item: object) => {
         return (
             <TouchableOpacity style={styles.itemContainer} onPress={() => { router.push({pathname: '/ChatRoom', params: item}) }}>
-                <Text style={styles.listItemText}>{item.name}</Text>
-                <Text style={styles.listItemText}>{item.email}</Text>
+                <View style={styles.itemContainerRow}>
+                    <FontAwesome6 name='user-circle' size={hp(2)} color='grey' style={styles.itemIcon} />
+                    <Text style={[styles.listItemText, styles.listItemTextBold]}>{item.name}</Text>
+                </View>
+                <View style={styles.itemContainerRow}>
+                    <Entypo name='email' size={hp(2)} color='grey' style={styles.itemIcon} />
+                    <Text style={styles.listItemText}>{item.email}</Text>
+                </View>
             </TouchableOpacity>
         )
     }
@@ -91,6 +98,12 @@ export default function ChatList(navigation: any) {
                 renderItem={({index, item}) => renderChatListItem(index, item)}
                 keyExtractor={item => item.uid}
                 style={styles.flatlistSty}
+                ListEmptyComponent={() => {
+                    return <View style={styles.flatlistEmptyContainer}>
+                        <ActivityIndicator color="powderblue" size={'large'} />
+                    </View>
+                }}
+                contentContainerStyle={{flex: 1}}
             />    
         </SafeAreaView>
     );
@@ -99,18 +112,35 @@ export default function ChatList(navigation: any) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        backgroundColor: '#ffffff'
     },
     flatlistSty: {
         margin: hp(1)
     },
+    flatlistEmptyContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
     itemContainer: {
         backgroundColor: 'white',
         borderRadius: hp(1),
-        padding: hp(1),
-        marginVertical: hp(0.5)
+        padding: hp(1.3),
+        marginVertical: hp(0.5),
+        marginHorizontal: wp(0.5)
+    },
+    itemContainerRow: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    itemIcon: {
+        marginRight: wp(1),
     },
     listItemText: {
-        fontSize: hp(2),
+        fontSize: hp(2.3),
+    },
+    listItemTextBold: {
+        fontWeight: 'bold'
     }
 });

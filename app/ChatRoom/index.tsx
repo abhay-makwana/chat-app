@@ -1,11 +1,11 @@
-import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, Alert, Pressable } from 'react-native';
+import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, Alert, Pressable, ActivityIndicator } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
-import { addDoc, collection, doc, getDoc, onSnapshot, orderBy, query, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc, startAfter, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
 
@@ -21,6 +21,9 @@ export default function ChatRoom(navigation: any) {
     const [message, setMessage] = useState("");
     const [isEditMsg, setIsEditMsg] = useState(false);
     const [selectedMsg, setSelectedMsg] = useState({});
+    const [lastVisible, setLastVisible] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [lastData, setLastData] = useState(false);
 
     const textRef = useRef("");
     const inputRef = useRef(null);
@@ -96,7 +99,6 @@ export default function ChatRoom(navigation: any) {
     const createRoomIfNotExists = async () => {
         const roomId = await getRoomId();
 
-        // console.log("Formatted room id:-", roomId)
         
         await setDoc(doc(db, "rooms", roomId), {
             roomId,
@@ -105,22 +107,30 @@ export default function ChatRoom(navigation: any) {
     }
 
     const getMessages = async () => {
+        setLoading(true)
         const roomId = await getRoomId();
         
         const docRef = doc(db, "rooms", roomId);
         const messageRef = collection(docRef, "messages");
-        const qry = query(messageRef, orderBy('createdAt', 'asc'));
-        // console.log("getMessages qry.:--", messageRef, JSON.stringify(qry))
+        let qry = query(messageRef, orderBy('createdAt', 'asc'), limit(20));
+        
+        if (lastVisible) {
+            qry = query(messageRef, orderBy('createdAt', 'asc'), limit(20), startAfter(lastVisible));
+        }
+        
         let unsub = onSnapshot(qry, (snapshot) => {
-            // console.log("snapshot.:-", snapshot)
             let allMessages = snapshot.docs.map(doc => ({
-                // console.log("snapshot map:-", doc.data(), doc.id);
-                msgId: doc.id,
+               msgId: doc.id,
                 ...doc.data()
             }));
-            // return allMessages
-            setMessageList([...allMessages])
+
+            const lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
+            setLastVisible(lastVisibleMessage);
+            setMessageList([...messageList, ...allMessages])
+            setLastData(allMessages.length === 0 ? true : false)
+            
         })
+        setLoading(false)
 
         return unsub;
     }
@@ -164,7 +174,6 @@ export default function ChatRoom(navigation: any) {
                     createdAt: Timestamp.fromDate(new Date())
                 })
                 setMessage("");
-                // console.log("new message info.:-", newDoc);
 
             } catch(err) {
                 Alert.alert(t('chatroom.message'), err.message)
@@ -172,13 +181,19 @@ export default function ChatRoom(navigation: any) {
         }
     }
 
+    const handleLoadMore = () => {
+        if (!lastData) {
+            // loadMessages();
+            getMessages()
+        }
+    };
+
     useEffect(() => {
         createRoomIfNotExists()
 
         getMessages()
     }, [])
 
-    // console.log("Message list:-", messageList)
     
     return (
         <SafeAreaView style={styles.container}>
@@ -201,6 +216,11 @@ export default function ChatRoom(navigation: any) {
                     renderItem={({index, item}) => renderMessageListItem(index, item)}
                     keyExtractor={item => Math.random()}
                     style={styles.flatlistSty}
+                    onEndReached={() => {handleLoadMore()}}
+                    // onEndReachedThreshold={0.01}
+                    // scrollEventThrottle={150}
+                    ListFooterComponent={loading ? <Text>Loading...</Text> : null}
+
                 />   
             </View>
 
@@ -232,7 +252,8 @@ export default function ChatRoom(navigation: any) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%'
+        height: '100%',
+        backgroundColor: '#ffffff'
     },
     headerContainer: {
         flexDirection: 'row',
@@ -253,16 +274,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
         padding: hp(1),
-        borderTopWidth: hp(0.1),
-        borderTopColor: 'lightgrey',
-        backgroundColor: 'white'
+        borderWidth: hp(0.1),
+        borderColor: 'lightgrey',
+        backgroundColor: '#ffffff',
+        borderRadius: hp(5),
+        marginHorizontal: wp(2),
+        marginBottom: hp(1)
     },
     input:{ 
         flex: 1,
-        // paddingHorizontal: hp(1),
         marginRight: hp(1),
         maxHeight: hp(12),
-        fontSize: hp(2)
+        fontSize: hp(2),
+        marginLeft: wp(1)
     },
     sendButtonContainer: {
         backgroundColor: 'powderblue',
@@ -282,7 +306,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'powderblue',
     },
     itemContainerReceiver: {
-        backgroundColor: 'white',
+        backgroundColor: '#f5f5f5',
     },
     leftAlignContainer: {
         alignItems: "flex-start" 

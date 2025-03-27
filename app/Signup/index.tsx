@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
@@ -8,7 +8,7 @@ import { auth, db } from '../../firebase';
 import { setDoc, doc } from 'firebase/firestore';
 
 
-export default function Signin() {
+export default function Signup() {
     const { t } = useTranslation();
 
     const [name, setName] = useState("");
@@ -21,19 +21,19 @@ export default function Signin() {
     const validateInputs = () => {
         const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?$/;
         if (!name) {
-            setNameError(t("signin.nameRequired"))
+            setNameError(t("signup.nameRequired"))
             return false
         } else if (!email) {
-            setEmailError(t("signin.emailRequired"))
+            setEmailError(t("signup.emailRequired"))
             return false
         } else if (email && !emailRegex.test(email)) {
-            setEmailError(t("signin.emailInvalid"))
+            setEmailError(t("signup.emailInvalid"))
             return false
         } else if (!password) {
-            setPasswordError(t("signin.passwordRequired"))
+            setPasswordError(t("signup.passwordRequired"))
             return false
         } else if (password && password.length < 6) {
-            setPasswordError(t("signin.passwordMinlength"))
+            setPasswordError(t("signup.passwordMinlength"))
             return false
         } else {
             return true
@@ -54,7 +54,7 @@ export default function Signin() {
             })
     }
 
-    const handleSignin = () => {
+    const handleSignup = () => {
         if (validateInputs()) {
             registerUser()
         }
@@ -62,7 +62,12 @@ export default function Signin() {
 
     return (
         <SafeAreaView style={styles.container}>
-                <Text style={styles.titleText}>{t('signin.signin')}</Text>
+                <Image
+                    source={require('../../assets/images/auth/login.jpg')}
+                    style={styles.loginImg}
+                />
+
+                <Text style={styles.titleText}>{t('signup.signup')}</Text>
 
                 <TextInput
                     style={styles.input}
@@ -71,7 +76,7 @@ export default function Signin() {
                         setNameError("");
                     }}
                     value={name}
-                    placeholder={t('signin.name')}
+                    placeholder={t('signup.name')}
                 />
                 {nameError && <Text style={styles.errorText}>{nameError}</Text>}
                 
@@ -82,7 +87,7 @@ export default function Signin() {
                         setEmailError("");
                     }}
                     value={email}
-                    placeholder={t('signin.email')}
+                    placeholder={t('signup.email')}
                 />
                 {emailError && <Text style={styles.errorText}>{emailError}</Text>}
 
@@ -93,20 +98,20 @@ export default function Signin() {
                         setPasswordError("");
                     }}
                     value={password}
-                    placeholder={t('signin.password')}
+                    placeholder={t('signup.password')}
                     secureTextEntry
                 />
                 {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
 
                 <TouchableOpacity
-                    onPress={() => {handleSignin()}}
-                    style={styles.signinButton}
+                    onPress={() => {handleSignup()}}
+                    style={styles.signupButton}
                 >
-                    <Text style={styles.buttonText}>{t('signin.signin')}</Text>
+                    <Text style={styles.buttonText}>{t('signup.signup')}</Text>
                 </TouchableOpacity>
 
                 <Link href="/Login" style={styles.registerButton}>
-                    {t('signin.alreadyHaveAccount')}
+                    {t('signup.alreadyHaveAccount')}
                 </Link>
         </SafeAreaView>
     );
@@ -117,30 +122,36 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: '#ffffff'
+    },
+    loginImg: {
+        width: wp(60),
+        height: hp(30),
+        resizeMode: 'contain',
     },
     titleText: {
         fontSize: hp(4),
         fontWeight: 'bold',
         color: 'grey',
-        marginBottom: hp(4)
+        marginBottom: hp(3)
     },
     input: {
         width: wp(80),
-        backgroundColor: '#FFFFFF',
-        padding: hp(1.5),
+        backgroundColor: '#f5f5f5',
+        padding: hp(1.7),
         marginVertical: hp(1),
-        borderRadius: hp(0.5)
+        borderRadius: hp(5)
     },
     errorText: {
         width: wp(80),
         textAlign: 'left'
     },
-    signinButton: {
+    signupButton: {
         width: wp(80),
         backgroundColor: 'powderblue',
         alignItems: 'center',
         paddingVertical: hp(1),
-        borderRadius: hp(0.5),
+        borderRadius: hp(5),
         marginTop: hp(2)
     },
     buttonText: {

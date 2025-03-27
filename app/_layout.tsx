@@ -32,8 +32,8 @@ export default function RootLayout() {
         // redirect to home
         router.replace('/ChatList');
       } else {
-        // redirect to signin
-        router.replace('/Signin');
+        // redirect to signup
+        router.replace('/Signup');
       }
     }, [isAuthenticated])
   }
@@ -55,7 +55,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
           <Stack.Screen name="Login/index" options={{ headerShown: false }} />
-          <Stack.Screen name="Signin/index" options={{ headerShown: false }} />
+          <Stack.Screen name="Signup/index" options={{ headerShown: false }} />
           <Stack.Screen name="ChaLlist/index" options={{ headerShown: false }} />
           <Stack.Screen name="ChatRoom/index" options={{ headerShown: false }} />
         </Stack>
