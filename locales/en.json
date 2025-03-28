@@ -3,6 +3,7 @@
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",
+    "logout": "Log out",
     "login": {
         "login": "Login",
         "email": "Email",

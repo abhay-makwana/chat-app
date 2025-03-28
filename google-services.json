@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "71932094507",
+    "project_id": "chatapp-be99b",
+    "storage_bucket": "chatapp-be99b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71932094507:android:939f680587dbd642f1226e",
+        "android_client_info": {
+          "package_name": "com.promactdev.ChatApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlzlG4_0F1_uLHx9-vx0zSl5Ugq1NXhFk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

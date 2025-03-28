@@ -33,7 +33,7 @@ export default function RootLayout() {
         router.replace('/ChatList');
       } else {
         // redirect to signup
-        router.replace('/Signup');
+        router.replace('/Login');
       }
     }, [isAuthenticated])
   }

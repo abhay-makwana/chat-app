@@ -10,6 +10,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -27,15 +28,6 @@ export default function Index() {
     const [notification, setNotification] = useState(false);
     const notificationListener = useRef();
     const responseListener = useRef();
-
-    // useEffect(() => {
-    //     onAuthStateChanged(auth, (user) => {
-    //         console.log("user det...", user)
-    //         // if (user) {
-    //         //     setUser(user)
-    //         // }
-    //     })
-    // }, [])
 
     async function registerForPushNotificationsAsync() {
         let token;
@@ -87,7 +79,7 @@ export default function Index() {
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
           //  console.log(response);
             const {notification: {request: {content: {data: {screen}}}}} = response
-//when the user taps on the notification, this line checks if they //are suppose to be taken to a particular screen
+            //when the user taps on the notification, this line checks if they //are suppose to be taken to a particular screen
             if (screen) {
                 // props.navigation.navigate(screen)
             }
@@ -99,12 +91,15 @@ export default function Index() {
         };
     }, []);
 
+    const redirectScreen = async () => {
+        const userData = await SecureStore.getItemAsync('user');
+        
+        return userData ? <ChatList /> : <Login />
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-            <Login />
-            {/* <Signup /> */}
-            {/* <ChatList /> */}
-            {/* <ChatRoom /> */}
+            {redirectScreen()}
         </SafeAreaView>
     );
 }

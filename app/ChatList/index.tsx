@@ -93,6 +93,13 @@ export default function ChatList(navigation: any) {
 
     return (
         <SafeAreaView style={styles.container}>
+            <TouchableOpacity
+                onPress={async () => {
+                    await SecureStore.setItemAsync('user', "");
+                    router.replace('/Login');
+                }}>
+                <Text style={styles.logoutBtn}>{t('logout')}</Text>
+            </TouchableOpacity>
             <FlatList
                 data={chatList}
                 renderItem={({index, item}) => renderChatListItem(index, item)}
@@ -142,5 +149,10 @@ const styles = StyleSheet.create({
     },
     listItemTextBold: {
         fontWeight: 'bold'
+    },
+    logoutBtn: {
+        fontSize: hp(2.5),
+        textAlign: 'right',
+        padding: hp(1)
     }
 });

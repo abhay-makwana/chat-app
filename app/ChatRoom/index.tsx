@@ -112,10 +112,10 @@ export default function ChatRoom(navigation: any) {
         
         const docRef = doc(db, "rooms", roomId);
         const messageRef = collection(docRef, "messages");
-        let qry = query(messageRef, orderBy('createdAt', 'asc'), limit(20));
+        let qry = query(messageRef, orderBy('createdAt', 'desc'), limit(20));
         
         if (lastVisible) {
-            qry = query(messageRef, orderBy('createdAt', 'asc'), limit(20), startAfter(lastVisible));
+            qry = query(messageRef, orderBy('createdAt', 'desc'), limit(20), startAfter(lastVisible));
         }
         
         let unsub = onSnapshot(qry, (snapshot) => {
@@ -127,7 +127,7 @@ export default function ChatRoom(navigation: any) {
             const lastVisibleMessage = snapshot.docs[snapshot.docs.length - 1];
             setLastVisible(lastVisibleMessage);
             setMessageList([...messageList, ...allMessages])
-            setLastData(allMessages.length === 0 ? true : false)
+            allMessages.length === 0  && setLastData(true)
             
         })
         setLoading(false)
@@ -219,6 +219,7 @@ export default function ChatRoom(navigation: any) {
                     onEndReached={() => {handleLoadMore()}}
                     // onEndReachedThreshold={0.01}
                     // scrollEventThrottle={150}
+                    inverted
                     ListFooterComponent={loading ? <Text>Loading...</Text> : null}
 
                 />   
