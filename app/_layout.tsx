@@ -3,11 +3,13 @@ import { useFonts } from 'expo-font';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
 import 'react-native-reanimated';
 import '@/i18n';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthContextProvider, useAuth } from '../context/authContext'
+import  ThemeProviderP, { ThemeContext } from '@/context/ThemeCOntext';
+import { Colors } from '@/constants/Colors';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -17,6 +19,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  const { currentTheme } = useContext(ThemeContext);
 
   const MainLayout = () => {
     const { isAuthenticated } = useAuth();
@@ -49,8 +53,9 @@ export default function RootLayout() {
   }
 
   return (
+    <ThemeProviderP>
     <AuthContextProvider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      {/* <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}> */}
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
@@ -58,9 +63,16 @@ export default function RootLayout() {
           <Stack.Screen name="Signup/index" options={{ headerShown: false }} />
           <Stack.Screen name="ChaLlist/index" options={{ headerShown: false }} />
           <Stack.Screen name="ChatRoom/index" options={{ headerShown: false }} />
+          <Stack.Screen name="Settings/index"
+            options={{
+              title: "Settings",
+              headerStyle: {
+                backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background
+              }}} />
         </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+        <StatusBar style={currentTheme === 'dark' ? 'light' : 'dark'} />
+      {/* </ThemeProvider> */}
     </AuthContextProvider>
+    </ThemeProviderP>
   );
 }

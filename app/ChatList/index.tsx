@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, ActivityIndicator } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,7 +8,9 @@ import * as SecureStore from 'expo-secure-store';
 import { doc, getDoc, getDocs, onSnapshot, query, collection, where, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import * as Notifications from "expo-notifications";
-import { Entypo, FontAwesome6 } from '@expo/vector-icons';
+import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons';
+import { ThemeContext } from '@/context/ThemeCOntext';
+import { Colors } from '@/constants/Colors';
 
 const isRtl = I18nManager.isRTL;
 
@@ -16,6 +18,8 @@ export default function ChatList(navigation: any) {
     const router = useRouter();
 
     const { i18n, t } = useTranslation();
+
+    const { currentTheme } = useContext(ThemeContext);
 
     const [chatList, setChatList] = useState([]);
 
@@ -78,28 +82,33 @@ export default function ChatList(navigation: any) {
 
     const renderChatListItem = (index: number, item: object) => {
         return (
-            <TouchableOpacity style={styles.itemContainer} onPress={() => { router.push({pathname: '/ChatRoom', params: item}) }}>
+            <TouchableOpacity style={[styles.itemContainer,{ backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]} onPress={() => { router.push({pathname: '/ChatRoom', params: item}) }}>
                 <View style={styles.itemContainerRow}>
-                    <FontAwesome6 name='user-circle' size={hp(2)} color='grey' style={styles.itemIcon} />
-                    <Text style={[styles.listItemText, styles.listItemTextBold]}>{item.name}</Text>
+                    <FontAwesome6 name='user-circle' size={hp(2)} color={currentTheme === 'dark' ? Colors.dark.icon : Colors.light.icon} style={styles.itemIcon} />
+                    <Text style={[styles.listItemText, styles.listItemTextBold, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{item.name}</Text>
                 </View>
                 <View style={styles.itemContainerRow}>
-                    <Entypo name='email' size={hp(2)} color='grey' style={styles.itemIcon} />
-                    <Text style={styles.listItemText}>{item.email}</Text>
+                    <Entypo name='email' size={hp(2)} color={currentTheme === 'dark' ? Colors.dark.icon : Colors.light.icon} style={styles.itemIcon} />
+                    <Text style={[styles.listItemText, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{item.email}</Text>
                 </View>
             </TouchableOpacity>
         )
     }
 
     return (
-        <SafeAreaView style={styles.container}>
-            <TouchableOpacity
+        <SafeAreaView style={[styles.container,{backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background}]}>
+            <View style={styles.settingsBtn}>
+                <TouchableOpacity onPress={() => { router.push('/Settings') }}>
+                    <Ionicons name='settings-outline' size={hp(3.5)} color={currentTheme === 'dark' ? Colors.dark.icon : Colors.light.icon} />
+                </TouchableOpacity>
+            </View>
+            {/* <TouchableOpacity
                 onPress={async () => {
                     await SecureStore.setItemAsync('user', "");
                     router.replace('/Login');
                 }}>
                 <Text style={styles.logoutBtn}>{t('logout')}</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <FlatList
                 data={chatList}
                 renderItem={({index, item}) => renderChatListItem(index, item)}
@@ -150,9 +159,8 @@ const styles = StyleSheet.create({
     listItemTextBold: {
         fontWeight: 'bold'
     },
-    logoutBtn: {
-        fontSize: hp(2.5),
-        textAlign: 'right',
+    settingsBtn: {
+        alignItems: 'flex-end',
         padding: hp(1)
     }
 });

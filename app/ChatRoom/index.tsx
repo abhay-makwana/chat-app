@@ -1,6 +1,6 @@
 import { Text, View, StyleSheet, TextInput, SafeAreaView, TouchableOpacity, I18nManager, FlatList, Alert, Pressable, ActivityIndicator } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -8,6 +8,8 @@ import * as SecureStore from 'expo-secure-store';
 import { addDoc, collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc, startAfter, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
+import { ThemeContext } from '@/context/ThemeCOntext';
+import { Colors } from '@/constants/Colors';
 
 
 const isRtl = I18nManager.isRTL;
@@ -16,6 +18,8 @@ export default function ChatRoom(navigation: any) {
     const router = useRouter();
     const item = useLocalSearchParams();
     const { i18n, t } = useTranslation();
+
+    const { currentTheme } = useContext(ThemeContext);
 
     const [messageList, setMessageList] = useState([]);
     const [message, setMessage] = useState("");
@@ -59,7 +63,7 @@ export default function ChatRoom(navigation: any) {
                 },
                 { text: t("delete"), onPress: async () => {
                     Alert.alert(
-                        "Are you sure you want to delete this message?",
+                        t("chatroom.deleteMessageConfirm"),
                         message.text,
                         [
                             { text: t("cancel"), style: "cancel" },
@@ -196,7 +200,7 @@ export default function ChatRoom(navigation: any) {
 
     
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]}>
             {/* header view */}
             <View style={styles.headerContainer}>
                 <TouchableOpacity
@@ -221,21 +225,21 @@ export default function ChatRoom(navigation: any) {
                     // scrollEventThrottle={150}
                     inverted
                     ListFooterComponent={loading ? <Text>Loading...</Text> : null}
-
                 />   
             </View>
 
             {/* bottom view  */}
-            <View style={styles.bottomContainer}>
+            <View style={[styles.bottomContainer, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]}>
                 <TextInput
                     ref={inputRef}
-                    style={styles.input}
+                    style={[styles.input, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}
                     onChangeText={(text) => {
                         textRef.current = text
                         !text.length && setIsEditMsg(false)
                     }}
                     // value={message}
                     placeholder={t('chatroom.yourMessage')}
+                    placeholderTextColor={currentTheme === 'dark' ? Colors.dark.text : Colors.light.text}
                     multiline
                 />
 
@@ -253,8 +257,7 @@ export default function ChatRoom(navigation: any) {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%',
-        backgroundColor: '#ffffff'
+        height: '100%'
     },
     headerContainer: {
         flexDirection: 'row',
@@ -277,7 +280,7 @@ const styles = StyleSheet.create({
         padding: hp(1),
         borderWidth: hp(0.1),
         borderColor: 'lightgrey',
-        backgroundColor: '#ffffff',
+        // backgroundColor: '#ffffff',
         borderRadius: hp(5),
         marginHorizontal: wp(2),
         marginBottom: hp(1)
