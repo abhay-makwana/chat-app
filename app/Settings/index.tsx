@@ -5,20 +5,33 @@ import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-nativ
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from 'expo-secure-store';
-import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ThemeContext } from '@/context/ThemeCOntext';
+import { Fontisto } from '@expo/vector-icons';
+import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
 
 export default function Settings(navigation: any) {
     const router = useRouter();
     const { i18n, t } = useTranslation();
+    const currentLanguage = i18n.language
 
     const { currentTheme, toggleTheme } = useContext(ThemeContext)
 
     // const [chatList, setChatList] = useState([]);
 
-    // useEffect(() => {
-    // }, []);
+    const changeLanguage = async (lang: string) => {
+        await AsyncStorage.setItem("language", lang);
+        i18n.changeLanguage(lang);
+    };
+
+    useEffect(() => {
+        const loadLanguage = async () => {
+            const savedLanguage = await AsyncStorage.getItem("language");
+            if (savedLanguage) {
+              i18n.changeLanguage(savedLanguage);
+            }
+          };
+        loadLanguage();
+    }, [i18n]);
 
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background}]}>
@@ -30,6 +43,19 @@ export default function Settings(navigation: any) {
                     <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('darkMode')}</Text>
                     <Switch value={currentTheme === 'dark'} onValueChange={() => toggleTheme(currentTheme === 'light' ? 'dark' : 'light')} />
                 </View>
+                <View style={styles.itemContainer}>
+                    <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('language')}</Text>
+                    <View style={styles.itemContainerRow}>
+                        <TouchableOpacity style={styles.itemContainerRow} onPress={() => changeLanguage('en')}>
+                            <Fontisto style={styles.itemIcon} name={currentLanguage === "en" ? "radio-btn-active" : "radio-btn-passive"} size={hp(2.5)} color={currentTheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+                            <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('english')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.itemContainerRow}  onPress={() => changeLanguage('yi')}>
+                        <Fontisto style={styles.itemIcon} name={currentLanguage === "yi" ? "radio-btn-active" : "radio-btn-passive"} size={hp(2.5)} color={currentTheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+                            <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('yiddish')}</Text>    
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <TouchableOpacity
                     onPress={async () => {
                         Alert.alert(
@@ -39,6 +65,9 @@ export default function Settings(navigation: any) {
                                 { text: t("no"), style: "cancel" },
                                 { text: t("yes"), onPress: async () => {
                                     await SecureStore.setItemAsync('user', "");
+                                    await AsyncStorage.clear();
+                                    toggleTheme('light');
+                                    i18n.changeLanguage('en');
                                     router.replace('/Login');
                                     }
                                 }
@@ -63,7 +92,15 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between'
     },
+    itemContainerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: wp(1.5)
+    },
     itemText: {
         fontSize: hp(3),        
+    },
+    itemIcon: {
+        marginHorizontal: wp(1)
     }
 });

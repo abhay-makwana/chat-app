@@ -1,5 +1,7 @@
 {
 	"language": "Language",
+    "english": "English",
+    "yiddish": "Yiddish",
     "edit": "Edit",
     "delete": "Delete",
     "cancel": "Cancel",

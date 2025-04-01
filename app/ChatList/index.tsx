@@ -9,7 +9,7 @@ import { doc, getDoc, getDocs, onSnapshot, query, collection, where, setDoc } fr
 import { db } from '../../firebase';
 import * as Notifications from "expo-notifications";
 import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons';
-import { ThemeContext } from '@/context/ThemeCOntext';
+import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
 
 const isRtl = I18nManager.isRTL;

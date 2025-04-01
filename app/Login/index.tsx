@@ -7,7 +7,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase';
 import * as SecureStore from 'expo-secure-store';
-import { ThemeContext } from '@/context/ThemeCOntext';
+import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
 
 
@@ -22,11 +22,6 @@ export default function Login() {
     const [emailError, setEmailError] = useState("");
     const [password, setPassword] = useState("");
     const [passwordError, setPasswordError] = useState("");
-
-    const changeLanguage = async (lang: string) => {
-        await AsyncStorage.setItem("language", lang);
-        i18n.changeLanguage(lang);
-    };
 
     const validateInputs = () => {
         if (!email) {

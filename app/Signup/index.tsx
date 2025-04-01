@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebase';
 import { setDoc, doc } from 'firebase/firestore';
-import { ThemeContext } from '@/context/ThemeCOntext';
+import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
 
 

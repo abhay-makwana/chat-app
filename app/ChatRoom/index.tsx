@@ -8,7 +8,7 @@ import * as SecureStore from 'expo-secure-store';
 import { addDoc, collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc, startAfter, Timestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Entypo, FontAwesome, MaterialIcons } from '@expo/vector-icons';
-import { ThemeContext } from '@/context/ThemeCOntext';
+import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
 
 
@@ -202,7 +202,7 @@ export default function ChatRoom(navigation: any) {
     return (
         <SafeAreaView style={[styles.container, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]}>
             {/* header view */}
-            <View style={styles.headerContainer}>
+            <View style={[styles.headerContainer, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]}>
                 <TouchableOpacity
                     style={styles.headerImgContainer}
                     onPress={() => {router.back()}}
@@ -210,7 +210,7 @@ export default function ChatRoom(navigation: any) {
                     <Entypo name='chevron-left' size={hp(4)} color='grey' />
                 </TouchableOpacity>
 
-                <Text style={styles.headerTitleText}>{item.name}</Text>
+                <Text style={[styles.headerTitleText, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{item.name}</Text>
             </View>
 
             {/* messages view */}
@@ -218,13 +218,13 @@ export default function ChatRoom(navigation: any) {
                 <FlatList
                     data={messageList}
                     renderItem={({index, item}) => renderMessageListItem(index, item)}
-                    keyExtractor={item => Math.random()}
+                    keyExtractor={item => Math.random().toString()}
                     style={styles.flatlistSty}
                     onEndReached={() => {handleLoadMore()}}
                     // onEndReachedThreshold={0.01}
                     // scrollEventThrottle={150}
                     inverted
-                    ListFooterComponent={loading ? <Text>Loading...</Text> : null}
+                    ListFooterComponent={loading ? <Text style={{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }}>Loading...</Text> : null}
                 />   
             </View>
 
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: hp(0.1),
         borderBottomColor: 'lightgrey',
         marginTop: hp(4),
-        backgroundColor: 'white'
+        // backgroundColor: 'white'
     },
     headerImgContainer: {
         marginRight: hp(1)

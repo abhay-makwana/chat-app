@@ -30,7 +30,6 @@ const ThemeProvider = ({children}: {children: ReactNode}) => {
     }, [])
 
     const toggleTheme = (newTheme: string) => {
-        alert(newTheme)
         setTheme(newTheme);
         AsyncStorage.setItem("theme", newTheme);
     }
