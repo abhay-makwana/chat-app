@@ -121,6 +121,9 @@ export default function ChatRoom(navigation: any) {
         if (lastVisible) {
             qry = query(messageRef, orderBy('createdAt', 'desc'), limit(20), startAfter(lastVisible));
         }
+
+        // reference.orderByChild("last_msg_time_stamp").limitToLast(10000)
+        // query(messageRef, orderByRefe);
         
         let unsub = onSnapshot(qry, (snapshot) => {
             let allMessages = snapshot.docs.map(doc => ({
@@ -218,13 +221,16 @@ export default function ChatRoom(navigation: any) {
                 <FlatList
                     data={messageList}
                     renderItem={({index, item}) => renderMessageListItem(index, item)}
-                    keyExtractor={item => Math.random().toString()}
+                    keyExtractor={(item, index) => index.toString()}
                     style={styles.flatlistSty}
                     onEndReached={() => {handleLoadMore()}}
-                    // onEndReachedThreshold={0.01}
+                    onEndReachedThreshold={0.5}
                     // scrollEventThrottle={150}
+                    // windowSize={20}
+                    initialNumToRender={20}
                     inverted
-                    ListFooterComponent={loading ? <Text style={{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }}>Loading...</Text> : null}
+                    disableVirtualization
+                    ListFooterComponent={loading ? <Text style={[styles.footerText , { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>Loading...</Text> : null}
                 />   
             </View>
 
@@ -320,12 +326,16 @@ const styles = StyleSheet.create({
     },
     listItemTextContainer: {
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        maxWidth: "90%"
     },
     delIcon: {
         marginRight: wp(1),
     },
     listItemText: {
         fontSize: hp(2),
+    },
+    footerText: {
+        textAlign: 'center',
     }
 });

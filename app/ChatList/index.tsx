@@ -11,8 +11,10 @@ import * as Notifications from "expo-notifications";
 import { Entypo, FontAwesome6, Ionicons } from '@expo/vector-icons';
 import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
+import { getLocales } from 'expo-localization';
 
-const isRtl = I18nManager.isRTL;
+// const isRtl = I18nManager.isRTL;
+let isRtl = getLocales()[0].languageCode == 'yi' ? true : false;
 
 export default function ChatList(navigation: any) {
     const router = useRouter();
@@ -22,6 +24,7 @@ export default function ChatList(navigation: any) {
     const { currentTheme } = useContext(ThemeContext);
 
     const [chatList, setChatList] = useState([]);
+    // const [isRtl, setIsRTL] = useState(getLocales()[0].languageCode)
 
     const getChatUsers = async () => {
         const usrData = await SecureStore.getItemAsync('user');
@@ -82,7 +85,7 @@ export default function ChatList(navigation: any) {
 
     const renderChatListItem = (index: number, item: object) => {
         return (
-            <TouchableOpacity style={[styles.itemContainer,{ backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]} onPress={() => { router.push({pathname: '/ChatRoom', params: item}) }}>
+            <TouchableOpacity style={[styles.itemContainer, { backgroundColor: currentTheme === 'dark' ? Colors.dark.background : Colors.light.background }]} onPress={() => { router.push({pathname: '/ChatRoom', params: item}) }}>
                 <View style={styles.itemContainerRow}>
                     <FontAwesome6 name='user-circle' size={hp(2)} color={currentTheme === 'dark' ? Colors.dark.icon : Colors.light.icon} style={styles.itemIcon} />
                     <Text style={[styles.listItemText, styles.listItemTextBold, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{item.name}</Text>
@@ -145,6 +148,9 @@ const styles = StyleSheet.create({
         padding: hp(1.3),
         marginVertical: hp(0.5),
         marginHorizontal: wp(0.5)
+    },
+    itemContainerRtl: {
+        alignItems: 'flex-end'
     },
     itemContainerRow: {
         flexDirection: 'row',

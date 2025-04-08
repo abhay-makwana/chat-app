@@ -8,6 +8,9 @@ import * as SecureStore from 'expo-secure-store';
 import { Fontisto } from '@expo/vector-icons';
 import { ThemeContext } from '@/context/ThemeContext';
 import { Colors } from '@/constants/Colors';
+import * as Localization from 'expo-localization';
+
+const isRtl = I18nManager.isRTL;
 
 export default function Settings(navigation: any) {
     const router = useRouter();
@@ -16,11 +19,16 @@ export default function Settings(navigation: any) {
 
     const { currentTheme, toggleTheme } = useContext(ThemeContext)
 
-    // const [chatList, setChatList] = useState([]);
+    // const [isRTL, setIsRTL] = useState(i18n.language === "yi" ? true : false);
 
     const changeLanguage = async (lang: string) => {
         await AsyncStorage.setItem("language", lang);
         i18n.changeLanguage(lang);
+        if (lang === 'yi') {
+            // alert(lang)
+            // I18nManager.allowRTL(true);
+            I18nManager.forceRTL(true);
+        }
     };
 
     useEffect(() => {
@@ -47,7 +55,7 @@ export default function Settings(navigation: any) {
                     <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('language')}</Text>
                     <View style={styles.itemContainerRow}>
                         <TouchableOpacity style={styles.itemContainerRow} onPress={() => changeLanguage('en')}>
-                            <Fontisto style={styles.itemIcon} name={currentLanguage === "en" ? "radio-btn-active" : "radio-btn-passive"} size={hp(2.5)} color={currentTheme === 'dark' ? Colors.dark.text : Colors.light.text} />
+                            <Fontisto style={styles.itemIcon} name={currentLanguage === "en" || currentLanguage === "en-US" ? "radio-btn-active" : "radio-btn-passive"} size={hp(2.5)} color={currentTheme === 'dark' ? Colors.dark.text : Colors.light.text} />
                             <Text style={[styles.itemText,{ color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('english')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.itemContainerRow}  onPress={() => changeLanguage('yi')}>
@@ -74,7 +82,7 @@ export default function Settings(navigation: any) {
                             ])
                         }                        
                     }>
-                    <Text style={[styles.itemText, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('logout')}</Text>
+                    <Text style={[styles.itemText, styles.itemTextMargin, { color: currentTheme === 'dark' ? Colors.dark.text : Colors.light.text }]}>{t('logout')}</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -99,6 +107,9 @@ const styles = StyleSheet.create({
     },
     itemText: {
         fontSize: hp(3),        
+    },
+    itemTextMargin: {
+        marginTop: hp(1),
     },
     itemIcon: {
         marginHorizontal: wp(1)
